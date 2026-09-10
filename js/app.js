@@ -57,50 +57,18 @@ function normalizeUrl(raw) {
 
 /* =============================================
    LOCALSTORAGE HELPERS
-   Centralised safe read/write with try/catch.
+   Note: Individual try/catch blocks are used
+   directly in init functions per requirements.
+   This helper is for non-init code paths.
    ============================================= */
-
-/** @type {boolean} Tracks whether the storage-unavailable banner has been shown. */
-let storageBannerShown = false;
-
-/**
- * Safely reads a key from localStorage.
- * Returns null on any error (SecurityError, private browsing, etc.).
- * @param {string} key
- * @returns {string|null}
- */
-function lsGet(key) {
-    try {
-        return localStorage.getItem(key);
-    } catch (_) {
-        showStorageBanner();
-        return null;
-    }
-}
-
-/**
- * Safely writes a value to localStorage.
- * Returns true on success, false on failure.
- * @param {string} key
- * @param {string} value
- * @returns {boolean}
- */
-function lsSet(key, value) {
-    try {
-        localStorage.setItem(key, value);
-        return true;
-    } catch (_) {
-        showStorageBanner();
-        return false;
-    }
-}
 
 /**
  * Displays a one-time storage-unavailable banner at the top of the dashboard.
+ * Called from try/catch blocks when storage fails.
  */
 function showStorageBanner() {
-    if (storageBannerShown) return;
-    storageBannerShown = true;
+    if (window.storageBannerShown) return;
+    window.storageBannerShown = true;
     const container = document.querySelector('.dashboard-container');
     if (!container) return;
     const banner = document.createElement('div');
@@ -137,14 +105,27 @@ function initThemeToggle() {
     }
 
     // Load saved theme before rendering — prevents flash of wrong theme.
-    const saved = lsGet('dashboard_theme');
+    let saved = null;
+    try {
+        saved = localStorage.getItem('dashboard_theme');
+    } catch (e) {
+        if (e instanceof SecurityError || e instanceof DOMException) {
+            showStorageBanner();
+        }
+    }
     const validTheme = (saved === 'light' || saved === 'dark') ? saved : 'light';
     applyTheme(validTheme);
 
     themeToggle.addEventListener('click', () => {
         const newTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
         applyTheme(newTheme);
-        lsSet('dashboard_theme', newTheme);
+        try {
+            localStorage.setItem('dashboard_theme', newTheme);
+        } catch (e) {
+            if (e instanceof SecurityError || e instanceof DOMException) {
+                showStorageBanner();
+            }
+        }
     });
 }
 
@@ -206,7 +187,15 @@ function initGreeting() {
     if (!container) return;
 
     // Load saved name (default "User")
-    let currentName = sanitizeName(lsGet('dashboard_username'));
+    let savedName = null;
+    try {
+        savedName = localStorage.getItem('dashboard_username');
+    } catch (e) {
+        if (e instanceof SecurityError || e instanceof DOMException) {
+            showStorageBanner();
+        }
+    }
+    let currentName = sanitizeName(savedName);
 
     // Get or rebuild the #user-name span
     function getUserNameSpan() {
@@ -237,7 +226,17 @@ function initGreeting() {
                 const newName = sanitizeName(input.value);
                 currentName = newName;
 
-                const saved = lsSet('dashboard_username', newName);
+                // Attempt to save to localStorage
+                let saved = false;
+                try {
+                    localStorage.setItem('dashboard_username', newName);
+                    saved = true;
+                } catch (e) {
+                    if (e instanceof SecurityError || e instanceof DOMException) {
+                        showStorageBanner();
+                    }
+                    saved = false;
+                }
 
                 // Rebuild the span
                 const newSpan = document.createElement('span');
@@ -363,15 +362,24 @@ function initTaskManager() {
     // Load tasks from localStorage (empty array on failure or absence)
     let tasks = [];
     try {
-        const raw = lsGet('dashboard_tasks');
+        const raw = localStorage.getItem('dashboard_tasks');
         const parsed = raw ? JSON.parse(raw) : null;
         if (Array.isArray(parsed)) tasks = parsed;
-    } catch (_) {
+    } catch (e) {
+        if (e instanceof SecurityError || e instanceof DOMException) {
+            showStorageBanner();
+        }
         tasks = [];
     }
 
     function saveTasks() {
-        lsSet('dashboard_tasks', JSON.stringify(tasks));
+        try {
+            localStorage.setItem('dashboard_tasks', JSON.stringify(tasks));
+        } catch (e) {
+            if (e instanceof SecurityError || e instanceof DOMException) {
+                showStorageBanner();
+            }
+        }
     }
 
     function showTaskError(msg) {
@@ -564,15 +572,24 @@ function initLinkManager() {
     // Load links from localStorage (empty array on failure)
     let quickLinks = [];
     try {
-        const raw = lsGet('dashboard_links');
+        const raw = localStorage.getItem('dashboard_links');
         const parsed = raw ? JSON.parse(raw) : null;
         if (Array.isArray(parsed)) quickLinks = parsed;
-    } catch (_) {
+    } catch (e) {
+        if (e instanceof SecurityError || e instanceof DOMException) {
+            showStorageBanner();
+        }
         quickLinks = [];
     }
 
     function saveLinks() {
-        lsSet('dashboard_links', JSON.stringify(quickLinks));
+        try {
+            localStorage.setItem('dashboard_links', JSON.stringify(quickLinks));
+        } catch (e) {
+            if (e instanceof SecurityError || e instanceof DOMException) {
+                showStorageBanner();
+            }
+        }
     }
 
     function showLinkError(msg) {
@@ -732,6 +749,9 @@ function runTests() {
    flash of wrong theme before content renders.
    ============================================= */
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the storageBannerShown flag inside DOMContentLoaded
+    window.storageBannerShown = false;
+    
     initThemeToggle();   // ← must be first
     initClock();
     initGreeting();

@@ -313,7 +313,7 @@ body {
     color: #ffffff;
     padding: 6px 10px;
     min-height: 36px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
 }
 
 .btn-danger:hover {
@@ -325,7 +325,7 @@ body {
    ============================================= */
 .error-msg {
     color: var(--error-color);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     margin-top: 6px;
     margin-bottom: 4px;
     display: block;
