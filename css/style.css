@@ -343,6 +343,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    max-height: 320px;
+    overflow-y: auto;
 }
 
 .task-item {
@@ -413,6 +415,28 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    
+    /* HEIGHT LIMIT AND SCROLLBAR */
+    max-height: 140px; /* Maximum height limit for the link area */
+    overflow-y: auto; /* Shows a vertical scrollbar if the links overflow */
+    padding-right: 4px; /* Small gap so the scrollbar doesn't touch the button */
+}
+/* Custom Scrollbar untuk Quick Links */
+.links-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.links-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.links-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+body.dark-theme .links-container::-webkit-scrollbar-thumb {
+    background: #3f3f5a;
 }
 
 .link-btn {
