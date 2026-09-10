@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- Section 1: Greeting & Clock -->
+        <header class="card header-card">
+            <div class="theme-toggle-container">
+                <button id="theme-toggle" class="btn btn-secondary">
+                    <span class="material-symbols-rounded">dark_mode</span> Dark Mode
+                </button>
+            </div>
+            <h1 id="time-display">00:00:00</h1>
+            <p id="date-display">Monday, January 1, 2026</p>
+            <h2 id="greeting-container">
+                <span id="greeting-text">Good Morning</span>,
+                <span id="user-name" class="editable-name" title="Click to change name">User</span>
+            </h2>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="grid-content">
+
+            <!-- Section 2: Focus Timer -->
+            <section class="card timer-card">
+                <h3><span class="material-symbols-rounded">timer</span> Focus Timer</h3>
+                <div id="timer-display" class="timer-time">25:00</div>
+                <div class="timer-controls">
+                    <button id="start-btn" class="btn btn-primary">Start</button>
+                    <button id="stop-btn" class="btn btn-secondary">Stop</button>
+                    <button id="reset-btn" class="btn btn-secondary">Reset</button>
+                </div>
+                <p id="timer-notification" class="timer-notification" hidden></p>
+            </section>
+
+            <!-- Section 3: To-Do List -->
+            <section class="card tasks-card">
+                <h3><span class="material-symbols-rounded">check_circle</span> Tasks</h3>
+                <form id="task-form" class="input-group">
+                    <input
+                        type="text"
+                        id="task-input"
+                        placeholder="Add a new task..."
+                        maxlength="100"
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </form>
+                <p id="task-error" role="alert" class="error-msg" hidden></p>
+                <ul id="task-list" class="task-list"></ul>
+            </section>
+
+            <!-- Section 4: Quick Links -->
+            <section class="card links-card">
+                <h3><span class="material-symbols-rounded">link</span> Quick Links</h3>
+                <form id="link-form" class="input-group link-input-group">
+                    <input
+                        type="text"
+                        id="link-name"
+                        placeholder="Name"
+                        maxlength="50"
+                        autocomplete="off"
+                    >
+                    <input
+                        type="text"
+                        id="link-url"
+                        placeholder="URL (e.g. google.com)"
+                        maxlength="2048"
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </form>
+                <p id="link-error" role="alert" class="error-msg" hidden></p>
+                <div id="links-container" class="links-container"></div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
